@@ -1,0 +1,53 @@
+version: '3'
+
+volumes:
+  dbdata:
+    name: dbdata
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/ldonita/data/dbdata
+  wordpress:
+    name: wordpress
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/ldonita/data/wordpress
+
+services:
+  nginx:
+    image: nginx
+    build: ./requirements/nginx
+    container_name: nginx
+    restart: always
+    ports:
+      - "443:443"
+    depends on:
+      - wordpress
+    volumes:
+      - wordpress:/var/www/html
+    networks:
+      docker_net
+
+  wordpress:
+    image: wordpress
+    build: ./requirements/wordpress
+    env_file: .env
+    container_name: wordpress
+    restart: always
+    # ports:
+    #   - "9000:9000"
+    # depends on:
+    #   - mysql
+    volumes:
+      - wordpress:/var/www/html
+    networks:
+      - docker_net
+
+  networks:
+    docker_net:
+      driver: bridge
+  
+
+
+  
